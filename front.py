@@ -10,7 +10,6 @@ def receptor(tela):
     while True:
         tela['state'] = 'normal'
         msg = s.recv(1024)
-        print("MENSAGEM RECEBIDA: "+msg)
         tela.insert(END, f'{msg.split(":",1)[0]}')
         tela['state'] = 'disabled'
 
