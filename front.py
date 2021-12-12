@@ -15,24 +15,23 @@ class NewWindow(Toplevel):
         self.title("Trivia Game")
         self.geometry("900x600")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
-        
+        global palavra
 
         with open("palavra.txt","r") as f:
             palavra =  f.readlines()
-        print("palavraaaa",palavra)
+        print("palavraaaa",palavra[0])
 
         if palavra[0] != '1':
-            self.janela2()
+            self.janela2('1')
         else:
             self.janelaMestre()
-
-        
-
 
     def janelaMestre(self):
         file_palavra = open('palavra.txt', 'w')
         file_palavra.write('0')
         file_palavra.close()
+
+ 
 
         label = Label(self, text ="Você é o mestre!!!!")
         label.place(x = 450, y = 50)
@@ -61,11 +60,12 @@ class NewWindow(Toplevel):
 
         # botao enviar
         btn_send = Button(self, text="Enviar!",
-                        command=lambda: [self.conferePalavra(svPalavra),self.confereDica(svDica), self.janela2(), btn_send.destroy()])
+                        command=lambda: [self.conferePalavra(svPalavra),self.confereDica(svDica), self.janela2('0'), btn_send.destroy()])
         btn_send.place(width=50, height=30, x = 100, y = 500)
+        if palavra[0] != "1":
+            self.janelaEspera()
 
-
-    def janela2(self):
+    def janela2(self, palavraMestre):
         with open("dica.txt","r") as f:
             dica = f.readlines()
         svDica = dica[0]
@@ -90,7 +90,9 @@ class NewWindow(Toplevel):
         btn_send = Button(self, text="Enviar",
                         command=lambda: self.confere(sv))
         btn_send.place(width=50, height=30, x = 600, y = 550)
-        
+
+        if palavraMestre == '0':
+            btn_send["state"] = DISABLED
 
         pontos = StringVar()
         pont_rcv = Entry(self, textvariable=pontos)
@@ -171,8 +173,6 @@ class NewWindow(Toplevel):
 
                 if message[0] == 'A':
                     text_rcv['state'] = 'normal'
-                    texto = message[1:]
-                    text_rcv.insert(END, f'{texto}\n') #insere o chute na tela
                     self.atualizaPontos(pont_rcv, pontos)
                     btn_send["state"] = DISABLED
                     text_rcv['state'] = 'disabled'
@@ -184,6 +184,9 @@ class NewWindow(Toplevel):
                     print("svdica:", texto)
                     svDica.set(texto)
                     label['state'] = 'disabled'
+                
+                if message[0] == 'J':
+                    self.janela2()
             except:
                 print('\nNão foi possível permanecer conectado no servidor!\n')
                 print('Pressione <Enter> Para continuar...')

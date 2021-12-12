@@ -5,16 +5,6 @@ import time
 from verificador import testaChute
 import string
 
-"""def listagem(client,player):
-    client.recv(1024).decode('utf-8')
-    while True:
-        time.sleep(5)
-        temp = ''
-        for user in players:
-            temp = ')' + str(user)
-            user.send(bytes(temp,'utf-8'))
-"""
-
 def messagesTreatment(client,player):
     while True:
         try:
@@ -69,25 +59,31 @@ def messagesTreatment(client,player):
 
             if indice == "3":
                 print("3:", texto)
-                resposta = testaChute(texto,players[player])
+                resposta = testaChute(texto,players[player],players[mestreAtual] )
+                
+                if resposta == 0:
+                    texto = "A"
+                    client.send(bytes(f'{texto}', 'utf-8')) 
+                    texto = "C"+ players[player]+ "Acertou!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                    broadcast(texto, client)
                 if resposta == 1:
                     texto = "C"+ players[player]+": "+ texto
-                elif resposta == 0:
-                    texto = "A"+ players[player]+ "Acertou!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-                broadcast(texto, client)
+                    broadcast(texto, client)
+                    
             if indice == "4": #insere palavra
                 print("4:", texto)
                 texto = texto.lower()
                 file_palavra = open('palavra.txt', 'w')
                 file_palavra.write(texto)
                 file_palavra.close()
+
             if indice == "5": #insere dica
                 print("5:", texto)
                 texto = texto.lower()
                 file_dica = open('dica.txt', 'w')
                 file_dica.write("Dica: " + texto)
                 file_dica.close()
-                
+
         except:
             deleteClient(client)
             break
@@ -97,7 +93,7 @@ def messagesTreatment(client,player):
 def broadcast(msg, client):
     for clientItem in clients:
         try:
-            print("broadcast")
+            print("broadcast: ", msg)
             clientItem.send(bytes(f'{msg}', 'utf-8')) 
         except:
             deleteClient(clientItem)
@@ -113,6 +109,7 @@ if os.path.exists("players.txt"):
 
 clients = list()
 players = list()
+mestreAtual = 0
 def main():
     player = 0
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
