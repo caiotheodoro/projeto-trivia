@@ -53,7 +53,7 @@ class NewWindow(Toplevel):
 
 
         svDica = StringVar() #input da dica
-        svDica.trace("w", lambda name, index, mode, sv=svDica: dicaConcat(sv))  # chama a função textConcat a cada modificação no texto
+        svDica.trace("w", lambda name, index, mode, sv=svDica: dicaConcat(svDica))  # chama a função textConcat a cada modificação no texto
 
         text_dica = Entry(self, textvariable=svDica)
         text_dica.place(width=100, height=25, x = 450, y = 200)
@@ -61,13 +61,15 @@ class NewWindow(Toplevel):
 
         # botao enviar
         btn_send = Button(self, text="Enviar!",
-                        command=lambda: [self.confereDica(svDica), self.conferePalavra(svPalavra), self.janela2()])
+                        command=lambda: [self.conferePalavra(svPalavra),self.confereDica(svDica), self.janela2(), btn_send.destroy()])
         btn_send.place(width=50, height=30, x = 100, y = 500)
 
 
     def janela2(self):
-
-        label = Label(self, text ="Dica: ____________")
+        with open("dica.txt","r") as f:
+            dica = f.readlines()
+        svDica = dica[0]
+        label = Label(self, text=svDica)
         label.place(x = 550, y = 50)
 
         label2 = Label(self, text ="Jogadores: Pontuação")
@@ -95,8 +97,7 @@ class NewWindow(Toplevel):
         pont_rcv['state'] = 'disabled'
         pont_rcv.place(width=340, height=400,x = 5,  y = 100)
 
-     
-        thread2 = threading.Thread(target=self.receptor, args=[text_rcv, pont_rcv, pontos, btn_send])
+        thread2 = threading.Thread(target=self.receptor, args=[text_rcv, pont_rcv, pontos, btn_send, svDica,label])
         thread2.start()
 
     def conferePalavra(self,palavra):
@@ -108,10 +109,18 @@ class NewWindow(Toplevel):
 
     def confereDica(self,dica):
         mensagem = dica.get()
+
+        file_dica = open('dica.txt', 'w')
+        file_dica.write("Dica: " + mensagem)
+        file_dica.close()
+
+
         mensagem = "5"+ mensagem
         print("confere dica:", mensagem)
         messageSend(mensagem)
         dica.set('')
+        
+
 
     def confere(self,message):
         mensagem = message.get() 
@@ -145,13 +154,14 @@ class NewWindow(Toplevel):
         pontos.set(texto)
         tela.insert(END, '\n')
         tela['state'] = 'disabled'
-
-    def receptor(self,text_rcv, pont_rcv, pontos, btn_send):
+        
+    def receptor(self,text_rcv, pont_rcv, pontos, btn_send, svDica, label):
         while True:
             try:
                 message = s.recv(1024).decode('utf-8') #recebe a mensagem do servidor
                 print("receptor:",message)
                 print("message[0]:",message[0])
+                
                 if message[0] == 'C':
                     text_rcv['state'] = 'normal'
                     texto = message[1:]
@@ -167,27 +177,19 @@ class NewWindow(Toplevel):
                     btn_send["state"] = DISABLED
                     text_rcv['state'] = 'disabled'
 
+                if message[0] == 'D':
+                    svDica.set('')
+                    texto = message[1:]
+                    label['state'] = 'normal'
+                    print("svdica:", texto)
+                    svDica.set(texto)
+                    label['state'] = 'disabled'
             except:
                 print('\nNão foi possível permanecer conectado no servidor!\n')
                 print('Pressione <Enter> Para continuar...')
                 s.close()
                 break
 
-  #if message == '/listaPlayers':
-   #         listaPlayers = []
-   #         listaPontos = []
-   #         string = '/'
-   #         with open("players.txt","r") as f1:
-    #            for word in f1.readlines():
-   #                 listaPlayers.append(word)
-   #         with open("pontos.txt","r") as f2:
-   #             for word in f2.readlines():
-   #                 listaPontos.append(word)
-   #         for i in range(len(listaPontos)):
-   #             string+= str(listaPlayers[i].split('\n')[0]) + ': ' + str(listaPontos[i].split('\n')[0]) + " pontos" + '\n'
-   #         print(string)
-   #         for user in players:
-   #             user.send(bytes(string, 'utf-8'))
 
 
 def dicaConcat(sv):

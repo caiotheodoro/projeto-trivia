@@ -85,8 +85,9 @@ def messagesTreatment(client,player):
                 print("5:", texto)
                 texto = texto.lower()
                 file_dica = open('dica.txt', 'w')
-                file_dica.write(texto)
+                file_dica.write("Dica: " + texto)
                 file_dica.close()
+                
         except:
             deleteClient(client)
             break
