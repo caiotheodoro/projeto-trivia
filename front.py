@@ -106,6 +106,7 @@ def textConcat(sv):
 def playerSend(player):
     player = player.get()#NOME JOGADOR
     msg = "1"+str(player)
+    print("playersend", msg)
     messageSend(msg)
 
 def messageSend(mensagem):

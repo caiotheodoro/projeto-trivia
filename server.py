@@ -17,10 +17,10 @@ def messagesTreatment(client,player):
     while True:
         try:
             msg = client.recv(2048).decode('utf-8')
+            print("|msg:", msg, "|")
+            print("|player:", player, "|")
             indice = msg[0]
             texto = msg[1:]
-            print("|msg:", msg, "|")
-
 
             if indice == "1":  #cria jogador e ponto respectivo
                 file_players = open('players.txt', 'a')
@@ -30,7 +30,10 @@ def messagesTreatment(client,player):
                 file_players.close()
                 file_pontos.close()
                 print("indice1:", msg)
+                players.append(texto)
+                print("players",players[0])
                 broadcast(msg, client)
+                
 
             if indice == "2": #apaga jogador e ponto respectivo
                 print("2:", texto)
@@ -58,8 +61,8 @@ def messagesTreatment(client,player):
                 broadcast(msg, client)
 
             if indice == "3":
-                texto = "C"+ player+": "+ texto
                 print("texto:", texto)
+                texto = "C"+ players[player]+": "+ texto
                 broadcast(texto, client)
 
         except:
@@ -84,7 +87,9 @@ if os.path.exists("players.txt"):
     os.remove("pontos.txt")
 
 clients = list()
+players = list()
 def main():
+    player = 0
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
@@ -97,10 +102,10 @@ def main():
     while True:
         client, addr = server.accept()
         clients.append(client)
-        player = client.recv(1024).decode('utf-8')
-        player = player.split("1")[1]
-        print(f'{player} conectou.  {addr}')
+       
+        print(f'{addr} conectou.')
         thread = threading.Thread(target=messagesTreatment, args=[client,player])
         thread.start()
+        player += 1
 if __name__ == '__main__':
     main()
