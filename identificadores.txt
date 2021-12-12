@@ -1,4 +1,5 @@
 1 - identificar player
 2 - fechar jogo
 3 - mensage (chute)
-
+4 - Palavra escolhida pelo Mestre
+5 - Dica escolhida pelo mestre

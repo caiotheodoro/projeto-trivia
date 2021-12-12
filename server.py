@@ -2,6 +2,8 @@ import socket
 import threading
 import os
 import time
+from verificador import testaChute
+import string
 
 """def listagem(client,player):
     client.recv(1024).decode('utf-8')
@@ -23,17 +25,21 @@ def messagesTreatment(client,player):
             texto = msg[1:]
 
             if indice == "1":  #cria jogador e ponto respectivo
+                print("1:", texto)
                 file_players = open('players.txt', 'a')
                 file_pontos = open('pontos.txt', 'a')
                 file_players.write(texto + "\n")
                 file_pontos.write("0" + "\n")
                 file_players.close()
                 file_pontos.close()
-                print("indice1:", msg)
                 players.append(texto)
-                print("players",players[0])
-                broadcast(msg, client)
-                
+                texto = "C"+ players[player]+" entrou."
+                if player == 0:
+                    file_palavra = open('palavra.txt', 'w')
+                    file_palavra.write('1')
+                    file_palavra.close()
+              
+                broadcast(texto, client)
 
             if indice == "2": #apaga jogador e ponto respectivo
                 print("2:", texto)
@@ -58,16 +64,33 @@ def messagesTreatment(client,player):
                             f.writelines("\n")
                         else:
                             f.writelines(line)
-                broadcast(msg, client)
+                saiu = "C"+ players[player]+" saiu."
+                broadcast(saiu, client)
 
             if indice == "3":
-                print("texto:", texto)
-                texto = "C"+ players[player]+": "+ texto
+                print("3:", texto)
+                resposta = testaChute(texto,players[player])
+                if resposta == 1:
+                    texto = "C"+ players[player]+": "+ texto
+                elif resposta == 0:
+                    texto = "A"+ players[player]+ "Acertou!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
                 broadcast(texto, client)
-
+            if indice == "4": #insere palavra
+                print("4:", texto)
+                texto = texto.lower()
+                file_palavra = open('palavra.txt', 'w')
+                file_palavra.write(texto)
+                file_palavra.close()
+            if indice == "5": #insere dica
+                print("5:", texto)
+                texto = texto.lower()
+                file_dica = open('dica.txt', 'w')
+                file_dica.write(texto)
+                file_dica.close()
         except:
             deleteClient(client)
             break
+
 
 
 def broadcast(msg, client):
@@ -77,6 +100,7 @@ def broadcast(msg, client):
             clientItem.send(bytes(f'{msg}', 'utf-8')) 
         except:
             deleteClient(clientItem)
+
 
 
 def deleteClient(client):

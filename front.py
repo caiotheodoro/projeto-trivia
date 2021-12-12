@@ -2,11 +2,11 @@ from threading import Thread
 import threading
 import socket
 from conf import PORT
-from verificador import testaChute
 from tkinter import *
 from tkinter.ttk import *
 import tkinter.font as font  
 from tkinter import messagebox
+import time
 
 class NewWindow(Toplevel):
      
@@ -15,8 +15,55 @@ class NewWindow(Toplevel):
         self.title("Trivia Game")
         self.geometry("900x600")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.janela2()
-        print('\nConectado')
+        
+
+        with open("palavra.txt","r") as f:
+            palavra =  f.readlines()
+        print("palavraaaa",palavra)
+
+        if palavra[0] != '1':
+            self.janela2()
+        else:
+            self.janelaMestre()
+
+        
+
+
+    def janelaMestre(self):
+        file_palavra = open('palavra.txt', 'w')
+        file_palavra.write('0')
+        file_palavra.close()
+
+        label = Label(self, text ="Você é o mestre!!!!")
+        label.place(x = 450, y = 50)
+
+        label2 = Label(self, text ="Escolha uma palavra para todos advinharem")
+        label2.place(x = 100, y = 100)
+
+        label3 = Label(self, text ="Escolha um dica para todos os jogadores")
+        label3.place(x = 100, y = 200)
+        
+
+        svPalavra = StringVar() #input da palavra
+        svPalavra.trace("w", lambda name, index, mode, sv=svPalavra: palavraConcat(sv))  # chama a função textConcat a cada modificação no texto
+
+        text_palavra = Entry(self, textvariable=svPalavra)
+        text_palavra.place(width=100, height=25, x = 450, y = 100)
+        text_palavra.focus_set()
+
+
+        svDica = StringVar() #input da dica
+        svDica.trace("w", lambda name, index, mode, sv=svDica: dicaConcat(sv))  # chama a função textConcat a cada modificação no texto
+
+        text_dica = Entry(self, textvariable=svDica)
+        text_dica.place(width=100, height=25, x = 450, y = 200)
+        text_dica.focus_set()
+
+        # botao enviar
+        btn_send = Button(self, text="Enviar!",
+                        command=lambda: [self.confereDica(svDica), self.conferePalavra(svPalavra), self.janela2()])
+        btn_send.place(width=50, height=30, x = 100, y = 500)
+
 
     def janela2(self):
 
@@ -42,20 +89,35 @@ class NewWindow(Toplevel):
                         command=lambda: self.confere(sv))
         btn_send.place(width=50, height=30, x = 600, y = 550)
         
-        pont_rcv = Text(self)
+
+        pontos = StringVar()
+        pont_rcv = Entry(self, textvariable=pontos)
         pont_rcv['state'] = 'disabled'
         pont_rcv.place(width=340, height=400,x = 5,  y = 100)
 
      
-        thread2 = threading.Thread(target=self.receptor, args=[text_rcv, pont_rcv])
+        thread2 = threading.Thread(target=self.receptor, args=[text_rcv, pont_rcv, pontos, btn_send])
         thread2.start()
+
+    def conferePalavra(self,palavra):
+        mensagem = palavra.get() 
+        mensagem = "4"+ mensagem
+        print("confere palavra:", mensagem)
+        messageSend(mensagem)
+        palavra.set('')
+
+    def confereDica(self,dica):
+        mensagem = dica.get()
+        mensagem = "5"+ mensagem
+        print("confere dica:", mensagem)
+        messageSend(mensagem)
+        dica.set('')
 
     def confere(self,message):
         mensagem = message.get() 
-        resChute = testaChute(mensagem); 
-        resChute = "3"+ resChute
-        print("confere resChute:", resChute)
-        messageSend(resChute)
+        mensagem = "3"+ mensagem
+        print("confere resChute:", mensagem)
+        messageSend(mensagem)
         message.set('')
         
     def on_closing(self):
@@ -64,18 +126,47 @@ class NewWindow(Toplevel):
         messageSend(var)
         self.destroy()
 
-    def receptor(self,text_rcv, pont_rcv):
+    def atualizaPontos(self,tela,pontos):
+        pontos.set('')
+        tela['state'] = 'normal'
+        listaPontos = []
+        listaPlayers = []
+        with open("players.txt","r") as f:
+            newline = []
+            for word in f.readlines():
+                listaPlayers.append(word)
+        with open("pontos.txt","r") as f2:
+            for word in f2.readlines():
+                listaPontos.append(word)
+        texto = '\n'
+        for i in range(len(listaPontos)):
+            if listaPlayers[i] != '\n':
+                texto +=  str(listaPlayers[i]) + ": " + str(listaPontos[i]) + ' pontos '
+        pontos.set(texto)
+        tela.insert(END, '\n')
+        tela['state'] = 'disabled'
+
+    def receptor(self,text_rcv, pont_rcv, pontos, btn_send):
         while True:
             try:
                 message = s.recv(1024).decode('utf-8') #recebe a mensagem do servidor
                 print("receptor:",message)
                 print("message[0]:",message[0])
                 if message[0] == 'C':
-                    texto = message[1:]
                     text_rcv['state'] = 'normal'
+                    texto = message[1:]
                     text_rcv.insert(END, f'{texto}\n') #insere o chute na tela
+                    self.atualizaPontos(pont_rcv, pontos)
                     text_rcv['state'] = 'disabled'
-                
+
+                if message[0] == 'A':
+                    text_rcv['state'] = 'normal'
+                    texto = message[1:]
+                    text_rcv.insert(END, f'{texto}\n') #insere o chute na tela
+                    self.atualizaPontos(pont_rcv, pontos)
+                    btn_send["state"] = DISABLED
+                    text_rcv['state'] = 'disabled'
+
             except:
                 print('\nNão foi possível permanecer conectado no servidor!\n')
                 print('Pressione <Enter> Para continuar...')
@@ -97,7 +188,15 @@ class NewWindow(Toplevel):
    #         print(string)
    #         for user in players:
    #             user.send(bytes(string, 'utf-8'))
-    
+
+
+def dicaConcat(sv):
+    global dica
+    dica = sv.get()
+
+def palavraConcat(sv):
+    global palavra
+    palavra = sv.get()
 
 def textConcat(sv):
     global texto
@@ -125,7 +224,6 @@ def main():
     global listaPlayers 
     global listaPontos 
     global linhas
-
     linhas = 0
     listaPlayers = []
     listaPontos = []
@@ -144,10 +242,10 @@ def main():
     inputText.pack(pady = 20)
 
     btn = Button(root, text ="Jogar!", width=25)
-    btn.bind("<Button>", lambda e: [NewWindow(root), root.withdraw(), playerSend(jogador)])
+    btn.bind("<Button>", lambda e: [playerSend(jogador), root.withdraw(), NewWindow(root)])
     btn.place(x=500, y=300)
     btn.pack(pady = 20)
-
+    
     root.mainloop()
 
 if __name__ == '__main__':
