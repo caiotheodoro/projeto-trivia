@@ -1,0 +1,4 @@
+1 - identificar player
+2 - fechar jogo
+3 - mensage (chute)
+

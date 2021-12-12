@@ -1,4 +1,5 @@
 from threading import Thread
+import threading
 import socket
 from conf import PORT
 from verificador import testaChute
@@ -6,7 +7,6 @@ from tkinter import *
 from tkinter.ttk import *
 import tkinter.font as font  
 from tkinter import messagebox
-import time
 
 class NewWindow(Toplevel):
      
@@ -16,9 +16,10 @@ class NewWindow(Toplevel):
         self.geometry("900x600")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.janela2()
-       
-    
+        print('\nConectado')
+
     def janela2(self):
+
         label = Label(self, text ="Dica: ____________")
         label.place(x = 550, y = 50)
 
@@ -45,87 +46,85 @@ class NewWindow(Toplevel):
         pont_rcv['state'] = 'disabled'
         pont_rcv.place(width=340, height=400,x = 5,  y = 100)
 
-        t = Thread(target=self.receptor, args=(text_rcv,))
-        t.start()
-        
-        t2 = Thread(target=self.listagem, args=(pont_rcv,))
-        t2.start()
+     
+        thread2 = threading.Thread(target=self.receptor, args=[text_rcv, pont_rcv])
+        thread2.start()
 
     def confere(self,message):
         mensagem = message.get() 
         resChute = testaChute(mensagem); 
-        s.send(bytes(resChute, 'utf-8'))
+        resChute = "3"+ resChute
+        print("confere resChute:", resChute)
+        messageSend(resChute)
         message.set('')
         
     def on_closing(self):
-        var = "1" + jogador.get()
-        s.send(bytes(var, 'utf-8'))
+        var = "2" + jogador.get()
+        print("on_closing var:", var)
+        messageSend(var)
         self.destroy()
 
-    def receptor(self,tela):
+    def receptor(self,text_rcv, pont_rcv):
         while True:
-            tela['state'] = 'normal'
-            message = s.recv(1024).decode('utf-8') #recebe a mensagem do servidor
-            if message[0] != ')':
-                chute = testaChute(message.split(":",1)[1]); #verifica se o chute é valido (split para pegar apenas o chute)
-                tela.insert(END, f'{message.split(":",1)[0]}: {chute}\n') #insere o chute na tela
-            tela['state'] = 'disabled'
-            
-        
+            try:
+                message = s.recv(1024).decode('utf-8') #recebe a mensagem do servidor
+                print("receptor:",message)
+                print("message[0]:",message[0])
+                if message[0] == 'C':
+                    texto = message[1:]
+                    text_rcv['state'] = 'normal'
+                    text_rcv.insert(END, f'{texto}\n') #insere o chute na tela
+                    text_rcv['state'] = 'disabled'
+                
+            except:
+                print('\nNão foi possível permanecer conectado no servidor!\n')
+                print('Pressione <Enter> Para continuar...')
+                s.close()
+                break
 
-    def listagem(self,tela):
-        while True:
-            tela['state'] = 'normal'
-            listaGeral = s.recv(1024).decode('utf-8')
-            if listaGeral[0] == ')':
-                print("listaGeral",listaGeral)
-                # if tela.get('1.0','end') == :
-                #tela.delete("1.0", END) 
-                #tela.insert(INSERT,listaGeral)
-            tela['state'] = 'disabled'
-
-"""
-  if message == '/listaPlayers':
-            listaPlayers = []
-            listaPontos = []
-            string = '/'
-            with open("players.txt","r") as f1:
-                for word in f1.readlines():
-                    listaPlayers.append(word)
-            with open("pontos.txt","r") as f2:
-                for word in f2.readlines():
-                    listaPontos.append(word)
-            for i in range(len(listaPontos)):
-                string+= str(listaPlayers[i].split('\n')[0]) + ': ' + str(listaPontos[i].split('\n')[0]) + " pontos" + '\n'
-            print(string)
-            for user in players:
-                user.send(bytes(string, 'utf-8'))
-        
-"""
+  #if message == '/listaPlayers':
+   #         listaPlayers = []
+   #         listaPontos = []
+   #         string = '/'
+   #         with open("players.txt","r") as f1:
+    #            for word in f1.readlines():
+   #                 listaPlayers.append(word)
+   #         with open("pontos.txt","r") as f2:
+   #             for word in f2.readlines():
+   #                 listaPontos.append(word)
+   #         for i in range(len(listaPontos)):
+   #             string+= str(listaPlayers[i].split('\n')[0]) + ': ' + str(listaPontos[i].split('\n')[0]) + " pontos" + '\n'
+   #         print(string)
+   #         for user in players:
+   #             user.send(bytes(string, 'utf-8'))
+    
 
 def textConcat(sv):
     global texto
     texto = sv.get()
-    
-def player_send(player):
-    player = player.get()
-    s.send(bytes(player, 'utf-8'))
-    file_players = open('players.txt', 'a')
-    file_pontos = open('pontos.txt', 'a')
-    file_players.write(player + "\n")
-    file_pontos.write("0" + "\n")
-    file_players.close()
-    file_pontos.close()
+   
+def playerSend(player):
+    player = player.get()#NOME JOGADOR
+    msg = "1"+str(player)
+    messageSend(msg)
 
-
-        
-        
-
+def messageSend(mensagem):
+    print("mensagemSend:",mensagem)
+    s.send(bytes(f'{mensagem}', 'utf-8')) 
+     
 def main():
+    
+    global s
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.connect((socket.gethostname(), PORT))
+    except:
+        return print('\nNão foi possívvel se conectar ao servidor!\n')
     global jogador
     global listaPlayers 
     global listaPontos 
     global linhas
+
     linhas = 0
     listaPlayers = []
     listaPontos = []
@@ -143,17 +142,13 @@ def main():
     inputText = Entry(root, textvariable=jogador, width=50)
     inputText.pack(pady = 20)
 
-
     btn = Button(root, text ="Jogar!", width=25)
-    btn.bind("<Button>", lambda e: [NewWindow(root), root.withdraw(), player_send(jogador)])
+    btn.bind("<Button>", lambda e: [NewWindow(root), root.withdraw(), playerSend(jogador)])
     btn.place(x=500, y=300)
     btn.pack(pady = 20)
-    
-    
+
     root.mainloop()
 
-
 if __name__ == '__main__':
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((socket.gethostname(), PORT))
+    
     main()
