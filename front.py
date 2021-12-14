@@ -60,9 +60,9 @@ class NewWindow(Toplevel):
 
         # botao enviar
         
-
+        global btn_start
         btn_start = Button(self, text="Inciar tempo",
-                        command=lambda: [self.clock(clock_count, 90), messageSend('7')])
+                        command=lambda: [self.clock(clock_count, 60), messageSend('7'), self.disableButton(btn_start)])
         btn_start.place(width=120, height=30, x = 10, y = 500)
 
         btn_send = Button(self, text="Enviar!",
@@ -97,8 +97,11 @@ class NewWindow(Toplevel):
                         command=lambda: self.confere(sv))
         btn_send.place(width=50, height=30, x = 600, y = 550)
 
+
+        btn_send["state"] = DISABLED
         if palavraMestre == '0':
-            btn_send["state"] = DISABLED
+            # hide btn_send
+            btn_send.place_forget()
 
         pontos = StringVar()
         pont_rcv = Entry(self, textvariable=pontos)
@@ -135,6 +138,9 @@ class NewWindow(Toplevel):
         messageSend(mensagem)
         dica.set('')
         
+    def disableButton(self, tela):
+        tela["state"] = DISABLED	
+
     def clock(self, tela, minutes):
         minut = int(minutes/60)
         minute = str(minut)
@@ -146,6 +152,7 @@ class NewWindow(Toplevel):
         else:
             tela.config(text=minute+':'+second + ' Tempo esgotado!')
             messageSend("6")
+            
 
     def confere(self,message):
         mensagem = message.get() 
@@ -182,6 +189,7 @@ class NewWindow(Toplevel):
         
     def receptor(self,text_rcv, pont_rcv, pontos, btn_send, svDica, label):
         while True:
+         
             try:
                 message = s.recv(1024).decode('utf-8') #recebe a mensagem do servidor
                 print("receptor:",message)
@@ -210,7 +218,8 @@ class NewWindow(Toplevel):
                 if message[0] == 'F':
                     btn_send["state"] = DISABLED
                 if message[0] == 'T':
-                    self.clock(clock_count, 90)
+                    self.clock(clock_count, 60)
+                    btn_send["state"] = NORMAL
                 if message[0] == 'J':
                     self.janela2()
             except:
