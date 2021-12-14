@@ -146,6 +146,7 @@ class NewWindow(Toplevel):
         else:
             tela.config(text=minute+':'+second + ' Tempo esgotado!')
             messageSend("6")
+            
 
     def confere(self,message):
         mensagem = message.get() 
