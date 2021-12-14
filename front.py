@@ -15,6 +15,9 @@ class NewWindow(Toplevel):
         self.title("Trivia Game")
         self.geometry("900x600")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self['bg']='#5d8a82'
+
+
         global palavra
 
         with open("palavra.txt","r") as f:
@@ -37,17 +40,21 @@ class NewWindow(Toplevel):
         label.place(x = 450, y = 50)
 
         label2 = Label(self, text ="Escolha uma palavra para todos advinharem")
-        label2.place(x = 100, y = 100)
+        label2.place(x = 100, y = 300)
 
         label3 = Label(self, text ="Escolha um dica para todos os jogadores")
         label3.place(x = 100, y = 200)
+        
+
+        label4 = Label(self, text ="Escolha um tema para todos os jogadores")
+        label4.place(x = 100, y = 100)
         
 
         svPalavra = StringVar() #input da palavra
         svPalavra.trace("w", lambda name, index, mode, sv=svPalavra: palavraConcat(sv))  # chama a função textConcat a cada modificação no texto
 
         text_palavra = Entry(self, textvariable=svPalavra)
-        text_palavra.place(width=100, height=25, x = 450, y = 100)
+        text_palavra.place(width=100, height=25, x = 450, y = 300)
         text_palavra.focus_set()
 
 
@@ -58,6 +65,13 @@ class NewWindow(Toplevel):
         text_dica.place(width=100, height=25, x = 450, y = 200)
         text_dica.focus_set()
 
+        svTema = StringVar() #input da dica
+        svTema.trace("w", lambda name, index, mode, sv=svTema: temaConcat(svTema))  # chama a função textConcat a cada modificação no texto
+
+        text_tema = Entry(self, textvariable=svTema)
+        text_tema.place(width=300, height=25, x = 450, y = 100)
+        text_tema.focus_set()
+
         # botao enviar
         
         global btn_start
@@ -66,7 +80,7 @@ class NewWindow(Toplevel):
         btn_start.place(width=120, height=30, x = 10, y = 500)
 
         btn_send = Button(self, text="Enviar!",
-                        command=lambda: [self.conferePalavra(svPalavra),self.confereDica(svDica), self.janela2('0'), btn_send.destroy()])
+                        command=lambda: [self.conferePalavra(svPalavra),self.confereDica(svDica),self.confereTema(svTema), self.janela2('0'), btn_send.destroy()])
         btn_send.place(width=50, height=30, x = 150, y = 500)
         if palavra[0] != "1":
             self.janelaEspera()
@@ -78,7 +92,13 @@ class NewWindow(Toplevel):
         label = Label(self, text=svDica)
         label.place(x = 550, y = 50)
 
-        label2 = Label(self, text ="Jogadores: Pontuação")
+        with open("tema.txt","r") as f:
+            tema = f.readlines()
+        svTema = tema[0]
+        label = Label(self, text=svTema)
+        label.place(x = 550, y = 20)
+
+        label2 = Label(self, text ="Jogadores: Pontuação",font=('Helvetica', '16'))
         label2.place(x = 150, y = 50)
 
         text_rcv = Text(self)
@@ -134,10 +154,20 @@ class NewWindow(Toplevel):
 
 
         mensagem = "5"+ mensagem
-        print("confere dica:", mensagem)
         messageSend(mensagem)
         dica.set('')
         
+    def confereTema(self,palavra):
+        mensagem = palavra.get() 
+
+        file_dica = open('tema.txt', 'w')
+        file_dica.write("Tema: " + mensagem)
+        file_dica.close()
+
+        mensagem = "8"+ mensagem
+        messageSend(mensagem)
+        palavra.set('')
+
     def disableButton(self, tela):
         tela["state"] = DISABLED	
 
@@ -234,6 +264,10 @@ def dicaConcat(sv):
     global dica
     dica = sv.get()
 
+def temaConcat(sv):
+    global tema
+    tema = sv.get()
+
 def palavraConcat(sv):
     global palavra
     palavra = sv.get()
@@ -271,8 +305,8 @@ def main():
     root = Tk()
     root.title("Trivia Game")
     root.geometry("900x600")
-
-    label_login = Message(root, text="\n\n\n\n\nDIGITE O NOME DO JOGADOR", font="Roboto 18 bold", width=500)
+    root['bg']='#5d8a82'
+    label_login = Message(root, text="\n\n\n\n\nDIGITE O NOME DO JOGADOR", font="Roboto 18 bold", width=500, bg="#5d8a82")
     label_login.place(x=40, y=300)
     label_login.pack(pady = 30)
 
