@@ -59,9 +59,15 @@ class NewWindow(Toplevel):
         text_dica.focus_set()
 
         # botao enviar
+        
+
+        btn_start = Button(self, text="Inciar tempo",
+                        command=lambda: [self.clock(clock_count, 90), messageSend('7')])
+        btn_start.place(width=120, height=30, x = 10, y = 500)
+
         btn_send = Button(self, text="Enviar!",
                         command=lambda: [self.conferePalavra(svPalavra),self.confereDica(svDica), self.janela2('0'), btn_send.destroy()])
-        btn_send.place(width=50, height=30, x = 100, y = 500)
+        btn_send.place(width=50, height=30, x = 150, y = 500)
         if palavra[0] != "1":
             self.janelaEspera()
 
@@ -99,6 +105,13 @@ class NewWindow(Toplevel):
         pont_rcv['state'] = 'disabled'
         pont_rcv.place(width=340, height=400,x = 5,  y = 100)
 
+
+        global clock_count
+        clock_count = Label(self, text='01:30',font=('Helvetica', '20'))	
+        clock_count.place(x = 10, y = 10)
+        clock_count.pack()
+        #self.clock(clock_count, 30)
+
         thread2 = threading.Thread(target=self.receptor, args=[text_rcv, pont_rcv, pontos, btn_send, svDica,label])
         thread2.start()
 
@@ -122,7 +135,17 @@ class NewWindow(Toplevel):
         messageSend(mensagem)
         dica.set('')
         
-
+    def clock(self, tela, minutes):
+        minut = int(minutes/60)
+        minute = str(minut)
+        second = str(minutes%60)
+        
+        tela.config(text=minute+':'+second)
+        if(minutes > 0):
+            tela.after(1000, lambda: self.clock(tela, minutes-1))
+        else:
+            tela.config(text=minute+':'+second + ' Tempo esgotado!')
+            messageSend("6")
 
     def confere(self,message):
         mensagem = message.get() 
@@ -184,7 +207,10 @@ class NewWindow(Toplevel):
                     print("svdica:", texto)
                     svDica.set(texto)
                     label['state'] = 'disabled'
-                
+                if message[0] == 'F':
+                    btn_send["state"] = DISABLED
+                if message[0] == 'T':
+                    self.clock(clock_count, 90)
                 if message[0] == 'J':
                     self.janela2()
             except:

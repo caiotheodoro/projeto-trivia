@@ -83,7 +83,10 @@ def messagesTreatment(client,player):
                 file_dica = open('dica.txt', 'w')
                 file_dica.write("Dica: " + texto)
                 file_dica.close()
-
+            if indice == "6": #fim da rodada
+                broadcast("F", client)
+            if indice == "7": #fim do jogo
+                broadcast("T", client)
         except:
             deleteClient(client)
             break
@@ -93,7 +96,6 @@ def messagesTreatment(client,player):
 def broadcast(msg, client):
     for clientItem in clients:
         try:
-            print("broadcast: ", msg)
             clientItem.send(bytes(f'{msg}', 'utf-8')) 
         except:
             deleteClient(clientItem)
