@@ -64,10 +64,13 @@ def messagesTreatment(client,player):
                 if resposta == 0:
                     texto = "A"
                     client.send(bytes(f'{texto}', 'utf-8')) 
-                    texto = "C"+ players[player]+ "Acertou!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+                    texto = "C"+ players[player]+ " Acertou !!"
                     broadcast(texto, client)
                 if resposta == 1:
                     texto = "C"+ players[player]+": "+ texto
+                    broadcast(texto, client)
+                if resposta == 2:
+                    texto = "C"+ players[player]+ " Passou perto!"
                     broadcast(texto, client)
                     
             if indice == "4": #insere palavra
@@ -80,9 +83,11 @@ def messagesTreatment(client,player):
             if indice == "5": #insere dica
                 print("5:", texto)
                 texto = texto.lower()
+                texto = "Dica: " + texto
                 file_dica = open('dica.txt', 'w')
-                file_dica.write("Dica: " + texto)
+                file_dica.write(texto)
                 file_dica.close()
+
                
             if indice == "6": #fim da rodada
                 broadcast("F", client)

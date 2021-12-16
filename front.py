@@ -231,7 +231,7 @@ class NewWindow(Toplevel):
                     text_rcv.insert(END, f'{texto}\n') #insere o chute na tela
                     self.atualizaPontos(pont_rcv, pontos)
                     text_rcv['state'] = 'disabled'
-
+                
                 if message[0] == 'A':
                     text_rcv['state'] = 'normal'
                     self.atualizaPontos(pont_rcv, pontos)
@@ -242,7 +242,6 @@ class NewWindow(Toplevel):
                     svDica.set('')
                     texto = message[1:]
                     label['state'] = 'normal'
-                    print("svdica:", texto)
                     svDica.set(texto)
                     label['state'] = 'disabled'
                 if message[0] == 'F':
