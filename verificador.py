@@ -36,7 +36,7 @@ def testaChute(texto, player, mestreAtual):
         resposta = list(palavra[0])
         contador = 0
         percent= (len(resposta)/2) +1
-        for i in range(len(word1)):
+        for i in range(len(palavra[0])):
             if word1[i] == resposta[i]:
                 contador+=1
         if contador >= percent:
