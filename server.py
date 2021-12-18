@@ -67,8 +67,8 @@ def messagesTreatment(client,player):
 
                 if resposta == 0:
                     texto = "A"
-                    client.send(bytes(f'{texto}', 'utf-8')) 
-                    texto = "C"+ players[player]+ " Acertou !!"
+                    client.send(bytes(f'{texto}', 'utf-8'))
+                    texto = "V"+ players[player]+ " Acertou !!"
                     broadcast(texto, client)
 
                 if resposta == 1:
@@ -76,7 +76,7 @@ def messagesTreatment(client,player):
                     broadcast(texto, client)
 
                 if resposta == 2:
-                    texto = "C"+ players[player]+ " Passou perto!"
+                    texto = "M"+ players[player]+ " Passou perto!"
                     broadcast(texto, client)
                     
             if indice == "4": #insere palavra

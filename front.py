@@ -92,7 +92,6 @@ class NewWindow(Toplevel):
     def janela2(self, palavraMestre):
         with open("dica.txt","r") as f:
             dica = f.readlines()
-        print("dica:",dica[0])	
         svDica = dica[0]
         label = Label(self, text=svDica)
         label.place(x = 550, y = 50)
@@ -238,6 +237,22 @@ class NewWindow(Toplevel):
                     self.atualizaPontos(pont_rcv, pontos)
                     text_rcv['state'] = 'disabled'
                 
+                if message[0] == 'V':
+                    text_rcv['state'] = 'normal'
+                    texto = message[1:]
+                    text_rcv.tag_config('verde', foreground='green')
+                    text_rcv.insert(END, f'{texto}\n', 'verde') #insere o chute na tela verde
+                    self.atualizaPontos(pont_rcv, pontos)
+                    text_rcv['state'] = 'disabled'
+
+                if message[0] == 'M':
+                    text_rcv['state'] = 'normal'
+                    texto = message[1:]
+                    text_rcv.tag_config('amarelo', foreground='#CCCC00')
+                    text_rcv.insert(END, f'{texto}\n', 'amarelo') #insere o chute na tela amarelo
+                    self.atualizaPontos(pont_rcv, pontos)
+                    text_rcv['state'] = 'disabled'
+
                 if message[0] == 'A':
                     text_rcv['state'] = 'normal'
                     self.atualizaPontos(pont_rcv, pontos)
