@@ -2,8 +2,8 @@ from threading import Thread
 import threading
 import socket
 from conf import PORT
-from tkinter import *
 from tkinter.ttk import *
+from tkinter import *
 import tkinter.font as font  
 from tkinter import messagebox
 import time
@@ -15,8 +15,7 @@ class NewWindow(Toplevel):
         self.title("Trivia Game")
         self.geometry("900x600")
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self['bg']='#5d8a82'
-
+        self['bg']='#6000FE'
 
         global palavra
 
@@ -37,8 +36,6 @@ class NewWindow(Toplevel):
         file_palavra = open('dica.txt', 'w')
         file_palavra.write('0')
         file_palavra.close()
-
- 
 
         label = Label(self, text ="Você é o mestre!!!!")
         label.place(x = 450, y = 50)
@@ -329,20 +326,25 @@ def main():
     root = Tk()
     root.title("Trivia Game")
     root.geometry("900x600")
-    root['bg']='#5d8a82'
-    label_login = Message(root, text="\n\n\n\n\nDIGITE O NOME DO JOGADOR", font="Roboto 18 bold", width=500, bg="#5d8a82")
-    label_login.place(x=40, y=300)
-    label_login.pack(pady = 30)
+    root['bg']='#6000FE'
+    imgDigite = PhotoImage(file="images/titulo1.png")
+    label_login = Label(root, text="\n\n\n\n\n",image=imgDigite,  width=800, bg="#6000FE")
+    label_login.place(x=40, y=500)
+    label_login.pack(pady = 100)
 
     jogador = StringVar() 
     jogador.trace("w", lambda name, index, mode, sv=jogador: textConcat(jogador))
-    inputText = Entry(root, textvariable=jogador, width=50)
-    inputText.pack(pady = 20)
+    inputText = Entry(root, textvariable=jogador, width=30, font=("Arial", 20))
+    inputText.pack(pady = 30)
+    imgJogar = PhotoImage(file="images/jogar.png")
+   
 
-    btn = Button(root, text ="Jogar!", width=25)
+
+
+    btn = Button(root, text ="Jogar!", image=imgJogar, bg="#6000FE", borderwidth=0)
     btn.bind("<Button>", lambda e: [playerSend(jogador), root.withdraw(), NewWindow(root)])
     btn.place(x=500, y=300)
-    btn.pack(pady = 20)
+    btn.pack(pady = 40)
     
     root.mainloop()
 
