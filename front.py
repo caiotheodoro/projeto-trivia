@@ -78,12 +78,12 @@ class NewWindow(Toplevel):
         
         global btn_start
         btn_start = Button(self, text="Inciar tempo",
-                        command=lambda: [self.clock(clock_count, 60), messageSend('7'), self.disableButton(btn_start)])
-        btn_start.place(width=120, height=30, x = 10, y = 520)
+                        command=lambda: [self.clock(clock_count, 60), messageSend('7'), self.disableButton(btn_start)], font=("Comic Sans MS", 14, "bold"), fg="white", bg="#6000FE")
+        btn_start.place(width=140, height=30, x = 10, y = 520)
 
         btn_send = Button(self, text="Enviar!",
-                        command=lambda: [time.sleep(0.5),self.conferePalavra(svPalavra),self.confereDica(svDica),self.confereTema(svTema), self.janela2('0'), btn_send.destroy()])
-        btn_send.place(width=50, height=30, x = 150, y = 500)
+                        command=lambda: [time.sleep(0.5),self.conferePalavra(svPalavra),self.confereDica(svDica),self.confereTema(svTema), self.janela2('0'), btn_send.destroy()], font=("Comic Sans MS", 14, "bold"), fg="white", bg="#6000FE")
+        btn_send.place(width=70, height=30, x = 100, y = 400)
         if palavra[0] != "1":
             self.janelaEspera()
 
@@ -117,8 +117,8 @@ class NewWindow(Toplevel):
 
         # botao enviar
         btn_send = Button(self, text="Enviar",
-                        command=lambda: self.confere(sv))
-        btn_send.place(width=50, height=30, x = 600, y = 550)
+                        command=lambda: self.confere(sv),  font=("Comic Sans MS", 14, "bold"), fg="white", bg="#6000FE")
+        btn_send.place(width=70, height=30, x = 590, y = 550)
 
 
         btn_send["state"] = DISABLED
