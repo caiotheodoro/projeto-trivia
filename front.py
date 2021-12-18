@@ -32,6 +32,10 @@ class NewWindow(Toplevel):
     def janelaMestre(self):
         file_palavra = open('palavra.txt', 'w')
         file_palavra.write('0')
+        file_palavra = open('tema.txt', 'w')
+        file_palavra.write('0')
+        file_palavra = open('dica.txt', 'w')
+        file_palavra.write('0')
         file_palavra.close()
 
  
@@ -80,7 +84,7 @@ class NewWindow(Toplevel):
         btn_start.place(width=120, height=30, x = 10, y = 500)
 
         btn_send = Button(self, text="Enviar!",
-                        command=lambda: [self.conferePalavra(svPalavra),self.confereDica(svDica),self.confereTema(svTema), self.janela2('0'), btn_send.destroy()])
+                        command=lambda: [time.sleep(0.5),self.conferePalavra(svPalavra),self.confereDica(svDica),self.confereTema(svTema), self.janela2('0'), btn_send.destroy()])
         btn_send.place(width=50, height=30, x = 150, y = 500)
         if palavra[0] != "1":
             self.janelaEspera()
@@ -88,6 +92,7 @@ class NewWindow(Toplevel):
     def janela2(self, palavraMestre):
         with open("dica.txt","r") as f:
             dica = f.readlines()
+        print("dica:",dica[0])	
         svDica = dica[0]
         label = Label(self, text=svDica)
         label.place(x = 550, y = 50)
@@ -95,6 +100,7 @@ class NewWindow(Toplevel):
         with open("tema.txt","r") as f:
             tema = f.readlines()
         svTema = tema[0]
+
         label = Label(self, text=svTema)
         label.place(x = 550, y = 20)
 
