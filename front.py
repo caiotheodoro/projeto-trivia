@@ -22,7 +22,7 @@ class NewWindow(Toplevel):
 
         with open("palavra.txt","r") as f:
             palavra =  f.readlines()
-        print("palavraaaa",palavra[0])
+        #print("palavraaaa",palavra[0])
 
         if palavra[0] != '1':
             self.janela2('1')
@@ -219,7 +219,7 @@ class NewWindow(Toplevel):
         
     def receptor(self,text_rcv, pont_rcv, pontos, btn_send, svDica, label):
         while True:
-         
+        
             try:
                 message = s.recv(1024).decode('utf-8') #recebe a mensagem do servidor
                 print("receptor:",message)
@@ -244,13 +244,17 @@ class NewWindow(Toplevel):
                     label['state'] = 'normal'
                     svDica.set(texto)
                     label['state'] = 'disabled'
+
                 if message[0] == 'F':
                     btn_send["state"] = DISABLED
+
                 if message[0] == 'T':
                     self.clock(clock_count, 60)
                     btn_send["state"] = NORMAL
+
                 if message[0] == 'J':
                     self.janela2()
+
             except:
                 print('\nNão foi possível permanecer conectado no servidor!\n')
                 print('Pressione <Enter> Para continuar...')
@@ -288,15 +292,15 @@ def messageSend(mensagem):
 def main():
     
     global s
+
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         s.connect((socket.gethostname(), PORT))
     except:
         return print('\nNão foi possívvel se conectar ao servidor!\n')
-    global jogador
-    global listaPlayers 
-    global listaPontos 
-    global linhas
+        
+    global jogador, listaPlayers, listaPontos, listaPontos, listaPontos, linhas
+
     linhas = 0
     listaPlayers = []
     listaPontos = []

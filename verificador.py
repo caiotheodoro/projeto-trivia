@@ -5,7 +5,7 @@ def testaChute(texto, player, mestreAtual):
         palavra =  f.readlines()
     
     texto = texto.lower()
-   #testa se o texto é igual a palavra
+    #testa se o texto é igual a palavra
     if texto == palavra[0]:
         linhaPlayer = 0
         linhaMestre = 0
