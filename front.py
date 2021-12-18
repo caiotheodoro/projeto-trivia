@@ -37,40 +37,41 @@ class NewWindow(Toplevel):
         file_palavra.write('0')
         file_palavra.close()
 
-        label = Label(self, text ="Você é o mestre!!!!")
-        label.place(x = 450, y = 50)
+        Font_tuple = ("Comic Sans MS", 16, "bold")
+        Font_tuple2 = ("Arial", 12, "bold")
+        label = Label(self, text ="Você é o mestre!", font=Font_tuple, fg="white", bg="#6000FE")
+        label.place(x = 10, y = 560)
 
-        label2 = Label(self, text ="Escolha uma palavra para todos advinharem")
-        label2.place(x = 100, y = 300)
+        label2 = Label(self, text ="Escolha uma palavra para advinharem: ",font=Font_tuple, fg="white", bg="#6000FE")
+        label2.place(x = 100, y = 100)
 
-        label3 = Label(self, text ="Escolha um dica para todos os jogadores")
+        label3 = Label(self, text ="Escolha um dica: ",font=Font_tuple, fg="white", bg="#6000FE")
         label3.place(x = 100, y = 200)
         
 
-        label4 = Label(self, text ="Escolha um tema para todos os jogadores")
-        label4.place(x = 100, y = 100)
+        label4 = Label(self, text ="Escolha um tema: ",font=Font_tuple, fg="white", bg="#6000FE")
+        label4.place(x = 100, y = 300)
         
 
         svPalavra = StringVar() #input da palavra
         svPalavra.trace("w", lambda name, index, mode, sv=svPalavra: palavraConcat(sv))  # chama a função textConcat a cada modificação no texto
 
-        text_palavra = Entry(self, textvariable=svPalavra)
-        text_palavra.place(width=100, height=25, x = 450, y = 300)
+        text_palavra = Entry(self, textvariable=svPalavra, font=Font_tuple2)
+        text_palavra.place(width=150,x = 100, y = 140)
         text_palavra.focus_set()
 
 
         svDica = StringVar() #input da dica
         svDica.trace("w", lambda name, index, mode, sv=svDica: dicaConcat(svDica))  # chama a função textConcat a cada modificação no texto
 
-        text_dica = Entry(self, textvariable=svDica)
-        text_dica.place(width=100, height=25, x = 450, y = 200)
+        text_dica = Entry(self, textvariable=svDica,font=Font_tuple2)
+        text_dica.place(width=150,x = 100, y = 240)
         text_dica.focus_set()
-
+            #7d6fb1
         svTema = StringVar() #input da dica
         svTema.trace("w", lambda name, index, mode, sv=svTema: temaConcat(svTema))  # chama a função textConcat a cada modificação no texto
-
-        text_tema = Entry(self, textvariable=svTema)
-        text_tema.place(width=300, height=25, x = 450, y = 100)
+        text_tema = Entry(self, textvariable=svTema,font=Font_tuple2)
+        text_tema.place(width=150,x = 100, y = 340)
         text_tema.focus_set()
 
         # botao enviar
@@ -78,7 +79,7 @@ class NewWindow(Toplevel):
         global btn_start
         btn_start = Button(self, text="Inciar tempo",
                         command=lambda: [self.clock(clock_count, 60), messageSend('7'), self.disableButton(btn_start)])
-        btn_start.place(width=120, height=30, x = 10, y = 500)
+        btn_start.place(width=120, height=30, x = 10, y = 520)
 
         btn_send = Button(self, text="Enviar!",
                         command=lambda: [time.sleep(0.5),self.conferePalavra(svPalavra),self.confereDica(svDica),self.confereTema(svTema), self.janela2('0'), btn_send.destroy()])
@@ -90,18 +91,18 @@ class NewWindow(Toplevel):
         with open("dica.txt","r") as f:
             dica = f.readlines()
         svDica = dica[0]
-        label = Label(self, text=svDica)
-        label.place(x = 550, y = 50)
+        Font_tuple = ("Comic Sans MS", 16, "bold")
+        label = Label(self, text=svDica, font=Font_tuple, fg="white", bg="#6000FE")
+        label.place(x = 650, y = 50)
 
         with open("tema.txt","r") as f:
             tema = f.readlines()
         svTema = tema[0]
 
-        label = Label(self, text=svTema)
-        label.place(x = 550, y = 20)
-
-        label2 = Label(self, text ="Jogadores: Pontuação",font=('Helvetica', '16'))
-        label2.place(x = 150, y = 50)
+        label = Label(self, text=svTema, font=Font_tuple, fg="white", bg="#6000FE")
+        label.place(x = 650, y = 20)
+        label2 = Label(self, text ="Jogadores: Pontuação", fg="white" ,bg="#6000FE", font=Font_tuple)
+        label2.place(x = 50, y = 50)
 
         text_rcv = Text(self)
         text_rcv['state'] = 'disabled'
@@ -132,9 +133,9 @@ class NewWindow(Toplevel):
 
 
         global clock_count
-        clock_count = Label(self, text='01:30',font=('Helvetica', '20'))	
-        clock_count.place(x = 10, y = 10)
-        clock_count.pack()
+        fontClock = ("ds-digital", 40, "bold")
+        clock_count = Label(self, text='01:00',font=fontClock, fg="green", bg="black")	
+        clock_count.place(x = 400, y = 25)
         #self.clock(clock_count, 30)
 
         thread2 = threading.Thread(target=self.receptor, args=[text_rcv, pont_rcv, pontos, btn_send, svDica,label])
