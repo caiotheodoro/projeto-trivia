@@ -23,11 +23,46 @@ class NewWindow(Toplevel):
             palavra =  f.readlines()
         #print("palavraaaa",palavra[0])
 
+     
+       
         if palavra[0] != '1':
-            self.janela2('1')
+            self.janelaEspera()
         else:
             self.janelaMestre()
 
+    def janelaEspera(self):
+   
+        Font_tuple = ("Comic Sans MS", 16, "bold")
+    
+
+        label2 = Label(self, text ="Mestre ainda não escolheu a palavra!\n Espere até o botão de Entrar no jogo ficar disponível. ",font=Font_tuple, fg="white", bg="#6000FE")
+        label2.place(x = 150, y = 100)
+
+        
+        global btn_entrar
+        btn_entrar = Button(self, text="Entrar no jogo",
+                        command=lambda: [self.janela2('1')], font=("Comic Sans MS", 20, "bold"), fg="white", bg="#7d6fb1")
+        btn_entrar.place(width=200, height=60, x = 350, y = 200)
+        btn_entrar["state"] = DISABLED
+
+
+        thread3 = threading.Thread(target=self.esperaPalavra, args=[btn_entrar])
+        thread3.start()
+
+ 
+    
+
+        # font=("Comic Sans MS", 14, "bold"), fg="white", bg="#6000FE"
+    
+    def esperaPalavra(self, btn_entrar):
+      while True:
+            time.sleep(2)
+            with open("palavra.txt","r") as f:
+                palavra =  f.readlines()
+            if palavra[0] != '0':
+                btn_entrar["state"] = NORMAL
+                break
+      
     def janelaMestre(self):
         file_palavra = open('palavra.txt', 'w')
         file_palavra.write('0')
@@ -78,18 +113,23 @@ class NewWindow(Toplevel):
         
         global btn_start
         btn_start = Button(self, text="Inciar tempo",
-                        command=lambda: [self.clock(clock_count, 60), messageSend('7'), self.disableButton(btn_start)], font=("Comic Sans MS", 14, "bold"), fg="white", bg="#6000FE")
+                        command=lambda: [self.clock(clock_count, 59), messageSend('7'), self.disableButton(btn_start)], font=("Comic Sans MS", 14, "bold"), fg="white", bg="#7d6fb1")
         btn_start.place(width=140, height=30, x = 10, y = 520)
 
         btn_send = Button(self, text="Enviar!",
                         command=lambda: [time.sleep(0.5),self.conferePalavra(svPalavra),self.confereDica(svDica),self.confereTema(svTema), self.janela2('0'), btn_send.destroy()], font=("Comic Sans MS", 14, "bold"), fg="white", bg="#6000FE")
         btn_send.place(width=70, height=30, x = 100, y = 400)
+        # font=("Comic Sans MS", 14, "bold"), fg="white", bg="#6000FE"
         if palavra[0] != "1":
             self.janelaEspera()
 
     def janela2(self, palavraMestre):
         with open("dica.txt","r") as f:
             dica = f.readlines()
+
+    
+    
+        print("tema:", dica[0])
         svDica = dica[0]
         Font_tuple = ("Comic Sans MS", 16, "bold")
         label = Label(self, text=svDica, font=Font_tuple, fg="white", bg="#6000FE")
@@ -97,6 +137,7 @@ class NewWindow(Toplevel):
 
         with open("tema.txt","r") as f:
             tema = f.readlines()
+        print("tema:", tema[0])
         svTema = tema[0]
 
         label = Label(self, text=svTema, font=Font_tuple, fg="white", bg="#6000FE")
@@ -117,7 +158,7 @@ class NewWindow(Toplevel):
 
         # botao enviar
         btn_send = Button(self, text="Enviar",
-                        command=lambda: self.confere(sv),  font=("Comic Sans MS", 14, "bold"), fg="white", bg="#6000FE")
+                        command=lambda: self.confere(sv),  font=("Comic Sans MS", 14, "bold"), fg="#ffffff", bg="#7d6fb1")
         btn_send.place(width=70, height=30, x = 590, y = 550)
 
 
@@ -268,7 +309,7 @@ class NewWindow(Toplevel):
                     btn_send["state"] = DISABLED
 
                 if message[0] == 'T':
-                    self.clock(clock_count, 60)
+                    self.clock(clock_count, 59)
                     btn_send["state"] = NORMAL
 
                 if message[0] == 'J':
