@@ -59,7 +59,6 @@ class NewWindow(Toplevel):
             time.sleep(2)
             with open("palavra.txt","r") as f:
                 palavra =  f.readlines()
-            print("palavraaaa",palavra[0])
             if palavra[0] != '0':
                 btn_entrar["state"] = NORMAL
                 break
@@ -82,7 +81,7 @@ class NewWindow(Toplevel):
         label2 = Label(self, text ="Escolha uma palavra para advinharem: ",font=Font_tuple, fg="white", bg="#6000FE")
         label2.place(x = 100, y = 100)
 
-        label3 = Label(self, text ="Escolha um dica: ",font=Font_tuple, fg="white", bg="#6000FE")
+        label3 = Label(self, text ="Escolha uma dica: ",font=Font_tuple, fg="white", bg="#6000FE")
         label3.place(x = 100, y = 200)
         
 
@@ -115,7 +114,7 @@ class NewWindow(Toplevel):
         
         global btn_start
         btn_start = Button(self, text="Inciar tempo",
-                        command=lambda: [self.clock(clock_count, 10), messageSend('7'), self.disableButton(btn_start)], font=("Comic Sans MS", 14, "bold"), fg="white", bg="#7d6fb1") #59
+                        command=lambda: [self.clock(clock_count, 90,0), messageSend('7'), self.disableButton(btn_start)], font=("Comic Sans MS", 14, "bold"), fg="white", bg="#7d6fb1") #59
         btn_start.place(width=140, height=30, x = 10, y = 520)
 
         btn_send = Button(self, text="Enviar!",
@@ -130,8 +129,6 @@ class NewWindow(Toplevel):
             dica = f.readlines()
 
     
-    
-        print("tema:", dica[0])
         svDica = dica[0]
         Font_tuple = ("Comic Sans MS", 16, "bold")
         label = Label(self, text=svDica, font=Font_tuple, fg="white", bg="#6000FE")
@@ -175,18 +172,38 @@ class NewWindow(Toplevel):
 
 
         global clock_count
-        fontClock = ("ds-digital", 40, "bold")
-        clock_count = Label(self, text='01:00',font=fontClock, fg="green", bg="black")	
-        clock_count.place(x = 400, y = 25)
+        fontClock = ("ds-digital", 20, "bold")
+        clock_count = Label(self, text='01:30',font=fontClock, fg="green", bg="black")	
+        clock_count.place(x = 150, y = 5)
         #self.clock(clock_count, 30)
+
+
+        with open("palavra.txt","r") as f: #_ _ _ _
+            texto = f.readlines() #[a, b, a, c, a, x, i]
+        global textoPreenche
+        textoPreenche=[]
+        textoPreenche[:0]=texto[0]
+        global tamPalavra
+        tamPalavra = len(textoPreenche)
+        global tempoAparecer
+        tempoAparecer = 90 / int(tamPalavra/2)
+        aux = ""
+        global underlines
+        underlines = StringVar()
+        for item in textoPreenche:
+            aux += "_ "
+        underlines.set(aux)
+        global dicaPalavra
+        dicaPalavra = Label(self, textvariable=underlines, font=Font_tuple, fg="white", bg="#6000FE")
+        dicaPalavra.place(x = 350, y = 30)
 
         thread2 = threading.Thread(target=self.receptor, args=[text_rcv, pont_rcv, pontos, btn_send, svDica,label,text_entry,clock_count,label2, label3])
         thread2.start()
 
+
     def conferePalavra(self,palavra):
         mensagem = palavra.get() 
         mensagem = "4"+ mensagem
-        print("confere palavra:", mensagem)
         messageSend(mensagem)
         palavra.set('')
 
@@ -216,14 +233,29 @@ class NewWindow(Toplevel):
     def disableButton(self, tela):
         tela["state"] = DISABLED	
 
-    def clock(self, tela, minutes):
+    def clock(self, tela, minutes, counter):
         minut = int(minutes/60)
         minute = str(minut)
         second = str(minutes%60)
         
         tela.config(text=minute+':'+second)
         if(minutes > 0):
-            tela.after(1000, lambda: self.clock(tela, minutes-1))
+            if(minutes % 20 == 0 and counter < (tamPalavra/2) -1): #tempoAparecer
+                aux=[]
+                aux[:0]=underlines.get()
+                if counter % 3 == 0:
+                    soma = 0
+                else:
+                    soma = counter
+
+                aux[counter*3 + soma] = textoPreenche[counter*2]
+                textoFinal  = ''
+                for item in aux:
+                    textoFinal += item
+                underlines.set(textoFinal)
+                counter += 1
+
+            tela.after(1000, lambda: self.clock(tela, minutes-1,counter))
         else:
             tela.config(text=minute+':'+second + ' Tempo esgotado!')
             messageSend("6")
@@ -232,13 +264,11 @@ class NewWindow(Toplevel):
     def confere(self,message):
         mensagem = message.get() 
         mensagem = "3"+ mensagem
-        print("confere resChute:", mensagem)
         messageSend(mensagem)
         message.set('')
         
     def on_closing(self):
         var = "2" + jogador.get()
-        print("on_closing var:", var)
         messageSend(var)
         self.destroy()
 
@@ -267,8 +297,6 @@ class NewWindow(Toplevel):
         
             try:
                 message = s.recv(1024).decode('utf-8') #recebe a mensagem do servidor
-                print("receptor:",message)
-                print("message[0]:",message[0])
                 
                 if message[0] == 'C':
                     text_rcv['state'] = 'normal'
@@ -336,9 +364,10 @@ class NewWindow(Toplevel):
                     label3.destroy()
                     labelEspera.destroy()
                     btn_entrar.destroy()
+                    dicaPalavra.destroy()
 
                 if message[0] == 'T':
-                    self.clock(clock_count, 10) #59
+                    self.clock(clock_count, 90,0) #59
                     btn_send["state"] = NORMAL
 
                 if message[0] == 'J':
@@ -349,8 +378,6 @@ class NewWindow(Toplevel):
                 print('Pressione <Enter> Para continuar...')
                 s.close()
                 break
-
-
 
 def dicaConcat(sv):
     global dica
@@ -371,11 +398,9 @@ def textConcat(sv):
 def playerSend(player):
     player = player.get()#NOME JOGADOR
     msg = "1"+str(player)
-    print("playersend", msg)
     messageSend(msg)
 
 def messageSend(mensagem):
-    print("mensagemSend:",mensagem)
     s.send(bytes(f'{mensagem}', 'utf-8')) 
      
 def main():
