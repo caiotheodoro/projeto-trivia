@@ -30,7 +30,7 @@ def messagesTreatment(client,player):
                     file_palavra.write('1')
                     file_palavra.close()
               
-                broadcast(texto, client)
+                broadcast(texto, '0')
 
             if indice == "2": #apaga jogador e ponto respectivo
                 print("2:", texto)
@@ -58,7 +58,7 @@ def messagesTreatment(client,player):
                         else:
                             f.writelines(line)
                 saiu = "C"+ players[player]+" saiu."
-                broadcast(saiu, client)
+                broadcast(saiu, '0')
 
             if indice == "3":
                 print("3:", texto)
@@ -69,15 +69,15 @@ def messagesTreatment(client,player):
                     texto = "A"
                     client.send(bytes(f'{texto}', 'utf-8'))
                     texto = "V"+ players[player]+ " Acertou !!"
-                    broadcast(texto, client)
+                    broadcast(texto, '0')
 
                 if resposta == 1:
                     texto = "C"+ players[player]+": "+ texto
-                    broadcast(texto, client)
+                    broadcast(texto, '0')
 
                 if resposta == 2:
                     texto = "M"+ players[player]+ " Passou perto!"
-                    broadcast(texto, client)
+                    broadcast(texto, '0')
                     
             if indice == "4": #insere palavra
                 print("4:", texto)
@@ -94,11 +94,17 @@ def messagesTreatment(client,player):
                 file_dica.write(texto)
                 file_dica.close()
 
-            if indice == "6": #fim da rodada
-                broadcast("F", client)
+            if indice == "6": #fim da rodada 
+
+                print("dseed",clients)
+                broadcast("F", clients[mestreAtual+1])
+                clients[mestreAtual+1].send(bytes(f'N', 'utf-8'))
+
+
 
             if indice == "7": #fim do jogo
-                broadcast("T", client)
+               
+                broadcast("T", '0')
 
             if indice == "8": #fim do jogo
                 texto = texto.lower()
@@ -112,10 +118,11 @@ def messagesTreatment(client,player):
 
 def broadcast(msg, client):
     for clientItem in clients:
-        try:
-            clientItem.send(bytes(f'{msg}', 'utf-8')) 
-        except:
-            deleteClient(clientItem)
+        if clientItem != client:
+            try:
+                clientItem.send(bytes(f'{msg}', 'utf-8')) 
+            except:
+                deleteClient(clientItem)
 
 def deleteClient(client):
     clients.remove(client)

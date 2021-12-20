@@ -7,6 +7,7 @@ from tkinter import *
 import tkinter.font as font  
 from tkinter import messagebox
 import time
+import sys
 
 class NewWindow(Toplevel):
      
@@ -34,17 +35,16 @@ class NewWindow(Toplevel):
    
         Font_tuple = ("Comic Sans MS", 16, "bold")
     
-
-        label2 = Label(self, text ="Mestre ainda não escolheu a palavra!\n Espere até o botão de Entrar no jogo ficar disponível. ",font=Font_tuple, fg="white", bg="#6000FE")
-        label2.place(x = 150, y = 100)
+        global labelEspera
+        labelEspera = Label(self, text ="Mestre ainda não escolheu a palavra!\n Espere até o botão de Entrar no jogo ficar disponível. ",font=Font_tuple, fg="white", bg="#6000FE")
+        labelEspera.place(x = 150, y = 100)
 
         
         global btn_entrar
         btn_entrar = Button(self, text="Entrar no jogo",
-                        command=lambda: [self.janela2('1')], font=("Comic Sans MS", 20, "bold"), fg="white", bg="#7d6fb1")
+                        command=lambda: [self.janela2('1'), labelEspera.destroy(),btn_entrar.destroy() ], font=("Comic Sans MS", 20, "bold"), fg="white", bg="#7d6fb1")
         btn_entrar.place(width=200, height=60, x = 350, y = 200)
         btn_entrar["state"] = DISABLED
-
 
         thread3 = threading.Thread(target=self.esperaPalavra, args=[btn_entrar])
         thread3.start()
@@ -59,19 +59,21 @@ class NewWindow(Toplevel):
             time.sleep(2)
             with open("palavra.txt","r") as f:
                 palavra =  f.readlines()
+            print("palavraaaa",palavra[0])
             if palavra[0] != '0':
                 btn_entrar["state"] = NORMAL
                 break
       
     def janelaMestre(self):
-        file_palavra = open('palavra.txt', 'w')
-        file_palavra.write('0')
-        file_palavra = open('tema.txt', 'w')
-        file_palavra.write('0')
-        file_palavra = open('dica.txt', 'w')
-        file_palavra.write('0')
-        file_palavra.close()
-
+        file_palavra1 = open('palavra.txt', 'w')
+        file_palavra1.write('0')
+        file_palavra2 = open('tema.txt', 'w')
+        file_palavra2.write('0')
+        file_palavra3 = open('dica.txt', 'w')
+        file_palavra3.write('0')
+        file_palavra1.close()
+        file_palavra2.close()
+        file_palavra3.close()
         Font_tuple = ("Comic Sans MS", 16, "bold")
         Font_tuple2 = ("Arial", 12, "bold")
         label = Label(self, text ="Você é o mestre!", font=Font_tuple, fg="white", bg="#6000FE")
@@ -137,9 +139,7 @@ class NewWindow(Toplevel):
 
         with open("tema.txt","r") as f:
             tema = f.readlines()
-        print("tema:", tema[0])
         svTema = tema[0]
-
         label2 = Label(self, text=svTema, font=Font_tuple, fg="white", bg="#6000FE")
         label2.place(x = 650, y = 20)
 
@@ -308,7 +308,7 @@ class NewWindow(Toplevel):
 
                 if message[0] == 'F':
                     btn_send["state"] = DISABLED
-                    time.sleep(2)
+                    time.sleep(3)
                     self.janelaEspera()
                     text_rcv.destroy()
                     pont_rcv.destroy()
@@ -319,6 +319,23 @@ class NewWindow(Toplevel):
                     label2.destroy()
                     label3.destroy()
                     btn_start.destroy()
+
+                if message[0] == 'N':
+                    file_palavra1 = open('palavra.txt', 'w')
+                    file_palavra1.write('0')
+                    file_palavra1.close()
+                    time.sleep(2)
+                    self.janelaMestre()
+                    text_rcv.destroy()
+                    pont_rcv.destroy()
+                    btn_send.destroy()
+                    label.destroy()
+                    text_entry.destroy()
+                    clock_count.destroy()
+                    label2.destroy()
+                    label3.destroy()
+                    labelEspera.destroy()
+                    btn_entrar.destroy()
 
                 if message[0] == 'T':
                     self.clock(clock_count, 10) #59
