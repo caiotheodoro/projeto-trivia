@@ -113,11 +113,11 @@ class NewWindow(Toplevel):
         
         global btn_start
         btn_start = Button(self, text="Inciar tempo",
-                        command=lambda: [self.clock(clock_count, 59), messageSend('7'), self.disableButton(btn_start)], font=("Comic Sans MS", 14, "bold"), fg="white", bg="#7d6fb1")
+                        command=lambda: [self.clock(clock_count, 10), messageSend('7'), self.disableButton(btn_start)], font=("Comic Sans MS", 14, "bold"), fg="white", bg="#7d6fb1") #59
         btn_start.place(width=140, height=30, x = 10, y = 520)
 
         btn_send = Button(self, text="Enviar!",
-                        command=lambda: [time.sleep(0.5),self.conferePalavra(svPalavra),self.confereDica(svDica),self.confereTema(svTema), self.janela2('0'), btn_send.destroy()], font=("Comic Sans MS", 14, "bold"), fg="white", bg="#6000FE")
+                        command=lambda: [time.sleep(0.5),self.conferePalavra(svPalavra),self.confereDica(svDica),self.confereTema(svTema), self.janela2('0'), btn_send.destroy(), label.destroy(), label2.destroy(), label3.destroy(), label4.destroy(),text_palavra.destroy(), text_dica.destroy(), text_tema.destroy() ], font=("Comic Sans MS", 14, "bold"), fg="white", bg="#6000FE")
         btn_send.place(width=70, height=30, x = 100, y = 400)
         # font=("Comic Sans MS", 14, "bold"), fg="white", bg="#6000FE"
         if palavra[0] != "1":
@@ -140,10 +140,11 @@ class NewWindow(Toplevel):
         print("tema:", tema[0])
         svTema = tema[0]
 
-        label = Label(self, text=svTema, font=Font_tuple, fg="white", bg="#6000FE")
-        label.place(x = 650, y = 20)
-        label2 = Label(self, text ="Jogadores: Pontuação", fg="white" ,bg="#6000FE", font=Font_tuple)
-        label2.place(x = 50, y = 50)
+        label2 = Label(self, text=svTema, font=Font_tuple, fg="white", bg="#6000FE")
+        label2.place(x = 650, y = 20)
+
+        label3 = Label(self, text ="Jogadores: Pontuação", fg="white" ,bg="#6000FE", font=Font_tuple)
+        label3.place(x = 50, y = 50)
 
         text_rcv = Text(self)
         text_rcv['state'] = 'disabled'
@@ -179,7 +180,7 @@ class NewWindow(Toplevel):
         clock_count.place(x = 400, y = 25)
         #self.clock(clock_count, 30)
 
-        thread2 = threading.Thread(target=self.receptor, args=[text_rcv, pont_rcv, pontos, btn_send, svDica,label])
+        thread2 = threading.Thread(target=self.receptor, args=[text_rcv, pont_rcv, pontos, btn_send, svDica,label,text_entry,clock_count,label2, label3])
         thread2.start()
 
     def conferePalavra(self,palavra):
@@ -261,7 +262,7 @@ class NewWindow(Toplevel):
         tela.insert(END, '\n')
         tela['state'] = 'disabled'
         
-    def receptor(self,text_rcv, pont_rcv, pontos, btn_send, svDica, label):
+    def receptor(self,text_rcv, pont_rcv, pontos, btn_send, svDica, label,text_entry,clock_count, label2, label3):
         while True:
         
             try:
@@ -307,9 +308,20 @@ class NewWindow(Toplevel):
 
                 if message[0] == 'F':
                     btn_send["state"] = DISABLED
+                    time.sleep(2)
+                    self.janelaEspera()
+                    text_rcv.destroy()
+                    pont_rcv.destroy()
+                    btn_send.destroy()
+                    label.destroy()
+                    text_entry.destroy()
+                    clock_count.destroy()
+                    label2.destroy()
+                    label3.destroy()
+                    btn_start.destroy()
 
                 if message[0] == 'T':
-                    self.clock(clock_count, 59)
+                    self.clock(clock_count, 10) #59
                     btn_send["state"] = NORMAL
 
                 if message[0] == 'J':
